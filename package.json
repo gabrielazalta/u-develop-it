@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "start": "node server.js",
+    "migrate": "sqlite3 db/election.db < db/schema.sql",
+    "seed": "sqlite3 db/election.db < db/seeds.sql",
+    "db": "sqlite3 db/election.db"
   },
   "repository": {
     "type": "git",
@@ -15,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/gabrielazalta/u-develop-it/issues"
   },
-  "homepage": "https://github.com/gabrielazalta/u-develop-it#readme"
+  "homepage": "https://github.com/gabrielazalta/u-develop-it#readme",
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
 }
