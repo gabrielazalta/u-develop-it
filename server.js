@@ -1,25 +1,26 @@
-const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const express = require('express');
 const inputCheck = require('./utils/inputCheck');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-//express middleware
+// Express middleware
 app.use(express.urlencoded({
     extended: false
 }));
 app.use(express.json());
 
-//connect to database
+// Connect to database 
 const db = new sqlite3.Database('./db/election.db', err => {
     if (err) {
         return console.error(err.message);
     }
+
     console.log('Connected to the election database.');
 });
 
-//get all candidates
+// Get all candidates 
 app.get('/api/candidates', (req, res) => {
     const sql = `SELECT * FROM candidates`;
     const params = [];
@@ -30,6 +31,7 @@ app.get('/api/candidates', (req, res) => {
             });
             return;
         }
+
         res.json({
             message: 'success',
             data: rows
@@ -37,9 +39,10 @@ app.get('/api/candidates', (req, res) => {
     });
 });
 
-//get a single candidate
+// Get single candidate
 app.get('/api/candidate/:id', (req, res) => {
-    const sql = `SELECT * FROM candidates WHERE id = ?`;
+    const sql = `SELECT * FROM candidates 
+               WHERE id = ?`;
     const params = [req.params.id];
     db.get(sql, params, (err, row) => {
         if (err) {
@@ -48,6 +51,7 @@ app.get('/api/candidate/:id', (req, res) => {
             });
             return;
         }
+
         res.json({
             message: 'success',
             data: row
@@ -55,7 +59,7 @@ app.get('/api/candidate/:id', (req, res) => {
     });
 });
 
-//create a candidate
+// Create a candidate
 app.post('/api/candidate', ({
     body
 }, res) => {
@@ -66,10 +70,11 @@ app.post('/api/candidate', ({
         });
         return;
     }
+
     const sql = `INSERT INTO candidates (first_name, last_name, industry_connected) 
-              VALUES (?,?,?)`;
+                VALUES (?,?,?)`;
     const params = [body.first_name, body.last_name, body.industry_connected];
-    // ES5 function, not arrow function, to use `this`
+    // ES5 function, not arrow function, to use this
     db.run(sql, params, function (err, result) {
         if (err) {
             res.status(400).json({
@@ -77,6 +82,7 @@ app.post('/api/candidate', ({
             });
             return;
         }
+
         res.json({
             message: 'success',
             data: body,
@@ -85,7 +91,7 @@ app.post('/api/candidate', ({
     });
 });
 
-//delete a candidate
+// Delete a candidate
 app.delete('/api/candidate/:id', (req, res) => {
     const sql = `DELETE FROM candidates WHERE id = ?`;
     const params = [req.params.id]
@@ -96,6 +102,7 @@ app.delete('/api/candidate/:id', (req, res) => {
             });
             return;
         }
+
         res.json({
             message: 'successfully deleted',
             changes: this.changes
@@ -103,14 +110,14 @@ app.delete('/api/candidate/:id', (req, res) => {
     });
 });
 
-//default response for any other request(Not Found) Catch all
+// Default response for any other request(Not Found) Catch all
 app.use((req, res) => {
     res.status(404).end();
 });
 
-//start server after DB connection
+// Start server after DB connection
 db.on('open', () => {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
-})
+});
